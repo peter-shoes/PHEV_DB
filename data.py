@@ -25,7 +25,7 @@ def mbmavg(sec):
 
 def main():
     cg = newcsv(mbmavg(sec1), mbmavg(sec2))
-    sns.catplot(x='Month', y='Average Temperature', hue='Period', data=cg, kind='bar')
+    #sns.catplot(x='Month', y='Average Temperature', hue='Period', data=cg, kind='bar')
 
 if __name__=='__main__':
     main()
