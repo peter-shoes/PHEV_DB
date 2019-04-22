@@ -13,11 +13,9 @@ temp_db = pd.read_csv('KCHS.csv', index_col=0)
 sec1 = temp_db[0:29]
 sec2 = temp_db[31:69]
 sec3 = temp_db[0:31]
+sec4 = temp_db[31:48]
+sec5 = temp_db[48:69]
 
-#convert to csv
-csv_sec1 = sec1.to_csv('raw_50-78.csv')
-csv_sec2 = sec2.to_csv('raw_81-18.csv')
-csv_sec3 = sec3.to_csv('raw_50-80.csv')
 months = temp_db.columns.values
 
 #create csv file to plot from
@@ -45,20 +43,21 @@ def yearavg(sec):
     return (temp_list)
 
 #find temperature deviation
-def temp_deviation(base, yby):
+def temp_deviation(base, yby, start, end):
     yby_dev_list = []
     yby_dev_dict = {}
     year_list = []
-    for i in range(1980,2019):
+    for i in range(start, end):
         year_list.append(i)
-    for i in range(0, 38):
+    for i in range(end-start):
         yby_point = yby[i]-base
         yby_dev_list.append('%0.1f'%yby_point)
-    for i in range(0,38):
+    for i in range(end-start):
         yby_dev_dict.update({year_list[i]: yby_dev_list[i]})
     return(yby_dev_dict)
 
 # method to build a climograph and get partition data
+
 def question_3():
     # set sections (question 3)
     set1=mbmavg(sec1)
@@ -84,11 +83,24 @@ def yearavg_printer(start, end, data):
     pp.pprint(year_dict_print)
 
 
+def deviation_graph(data_in, start, end):
+    print('')
+    print('Average Temperature Deviation by Year (%d-%d)'%(start,end))
+    pp.pprint(data_in)
+    deviation = pd.DataFrame(data=data_in,index=data_in.keys(), dtype=None, columns=None)
+    melt = pd.melt(deviation, var_name='Year', value_name='Average Temperature Deviation')
+    # plot temp_deviation column graph, display
+    sns.catplot(data=deviation, kind='bar')
+    plt.show()
+
+
 # method to build a temperature deviation bar graph and get data
 def question_4():
     #set sections (question 4)
     set3 = yearavg(sec3)
     set4 = yearavg(sec2)
+    set5 = yearavg(sec4)
+    set6 = yearavg(sec5)
 
     # Show average temperature by year
     print('Average Temperature by Year')
@@ -97,18 +109,14 @@ def question_4():
 
     #find temperature temp_deviation
 
-    tdv = temp_deviation(statistics.mean(set3), set4)
+    tdv = temp_deviation(statistics.mean(set3), set4, 1980,2018)
+    deviation_graph(tdv, 1980, 2019)
 
-    #build temperature deviation csv
-    print('')
-    print('Average Temperature Deviation by Year (1981-2018)')
-    pp.pprint(tdv)
-    deviation = pd.DataFrame(data=tdv,index=tdv.keys(), dtype=None, columns=None)
-    melt = pd.melt(deviation, var_name='Year', value_name='Average Temperature Deviation')
-    deviation_csv = deviation.to_csv('temp_deviation.csv')
-    # plot temp_deviation column graph, display
-    sns.catplot(data=deviation, kind='bar')
-    plt.show()
+    tdv2 = temp_deviation(statistics.mean(set3), set5, 1981,1998)
+    deviation_graph(tdv2, 1981, 1997)
+
+    tdv3 = temp_deviation(statistics.mean(set3), set6, 1998,2019)
+    deviation_graph(tdv3, 1998, 2018)
 
 
 def main():
